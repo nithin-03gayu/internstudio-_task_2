@@ -1,0 +1,73 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import re
+
+from wordcloud import WordCloud
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import SVC
+from sklearn.metrics import classification_report, confusion_matrix
+
+import nltk
+nltk.download('stopwords')
+# Replace with your dataset path or upload through Colab
+df = pd.read_csv("product_reviews.csv")  # Must have 'text' and 'sentiment' columns
+df = df[['text', 'sentiment']].dropna()
+df['sentiment'] = df['sentiment'].str.lower()
+df.head()
+stop_words = set(stopwords.words('english'))
+stemmer = PorterStemmer()
+
+def preprocess_text(text):
+    text = re.sub(r"[^a-zA-Z]", " ", text)
+    text = text.lower()
+    words = text.split()
+    words = [stemmer.stem(w) for w in words if w not in stop_words]
+    return " ".join(words)
+
+df['clean_text'] = df['text'].apply(preprocess_text)
+vectorizer = TfidfVectorizer(max_features=5000)
+X = vectorizer.fit_transform(df['clean_text']).toarray()
+y = df['sentiment']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+nb_model = MultinomialNB()
+nb_model.fit(X_train, y_train)
+nb_pred = nb_model.predict(X_test)
+
+print("----- Naive Bayes -----")
+print(confusion_matrix(y_test, nb_pred))
+print(classification_report(y_test, nb_pred))
+nb_model = MultinomialNB()
+nb_model.fit(X_train, y_train)
+nb_pred = nb_model.predict(X_test)
+
+print("----- Naive Bayes -----")
+print(confusion_matrix(y_test, nb_pred))
+print(classification_report(y_test, nb_pred))
+svm_model = SVC(kernel='linear')
+svm_model.fit(X_train, y_train)
+svm_pred = svm_model.predict(X_test)
+
+print("----- SVM -----")
+print(confusion_matrix(y_test, svm_pred))
+print(classification_report(y_test, svm_pred))
+# Positive Word Cloud
+plt.figure(figsize=(10, 6))
+plt.imshow(WordCloud(width=800, height=400, background_color='white').generate(positive_text), interpolation='bilinear')
+plt.axis('off')
+plt.title("Positive Review Word Cloud")
+plt.show()
+
+# Negative Word Cloud
+plt.figure(figsize=(5, 6))
+plt.imshow(WordCloud(width=800, height=400, background_color='white').generate(negative_text), interpolation='bilinear')
+plt.axis('off')
+plt.title("Negative Review Word Cloud")
+plt.show()
+
+
