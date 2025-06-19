@@ -1,0 +1,6 @@
+This Sentiment Analysis project was completed as part of an internship offered by InternStudio.
+It focuses on classifying product reviews into positive, neutral, and negative categories using NLP techniques.
+Text preprocessing includes tokenization, stemming, and stop word removal.
+Machine learning models like Naive Bayes, SVM, and a deep learning LSTM model were implemented.
+Visualizations such as word clouds and sentiment distribution charts were generated for insights.
+The project demonstrates practical applications of NLP and sentiment classification in real-world datasets.
